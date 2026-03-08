@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Entrada - Empresa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body id="entrada">
+    <div id="app-container">
+        <header>Nova Entrada (Empresa)</header>
+        <main>
+            <a href="../" class="btn-voltar">← Voltar</a>
+
+            <form id="empresa">
+                <div class="form-group">
+                    <label for="price">Valor (R$)</label>
+                    <input id="price" name="price" type="number" inputmode="numeric" step="0.01" class="form-control"
+                        placeholder="Ex: 150,00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pay">Forma de Pagamento</label>
+                    <select name="pay" id="pay" class="form-control" required>
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="pix">PIX</option>
+                        <option value="dinheiro">Dinheiro</option>
+                        <option value="cartao_credito">Cartão de Crédito</option>
+                        <option value="cartao_debito">Cartão de Débito</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="desc">Descrição</label>
+                    <textarea name="desc" id="desc" class="form-control" rows="4"
+                        placeholder="Ex: Venda de 5 caixas de brigadeiro..." required></textarea>
+                </div>
+
+                <div class="form-group" id="grupo-repasse">
+                    <label for="check-repasse">
+                        <input type="checkbox" id="check-repasse" style="width: 20px; height: 20px;">
+                        Repassar parte do valor para a conta Pessoal?
+                    </label>
+                    <small style="color: #666; margin-left: 30px;">O valor será dividido na hora de salvar.</small>
+                </div>
+
+                <button type="submit" class="btn btn-full">SALVAR TRANSAÇÃO</button>
+            </form>
+        </main>
+    </div>
+
+    <script defer type="module" src="../js/flow.js"></script>
+</body>
+
+</html>

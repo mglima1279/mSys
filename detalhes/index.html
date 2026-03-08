@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes - Meus Doces</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    <div id="app-container">
+        <header>Detalhes da Transação</header>
+        <main>
+            <a href="../extrato/" class="btn-voltar">← Voltar</a>
+
+            <div class="detalhes-header">
+                <h3>VALOR</h3>
+                <h1 id="detalhe-valor">R$ 0,00</h1>
+            </div>
+
+            <div class="detalhes-info">
+                <p>Forma de Pagamento <span id="detalhe-metodo">Carregando...</span></p>
+                <p>Data <span id="detalhe-data">--/--/----</span></p>
+                <p>Categoria <span id="detalhe-categoria">---</span></p>
+            </div>
+
+            <div class="detalhes-desc">
+                <p><strong>Descrição:</strong></p>
+                <p id="detalhe-descricao">Carregando detalhes...</p>
+            </div>
+
+            <div class="btn-group">
+                <a href="../editar-transacao/" class="btn btn-full" id="btn-editar">EDITAR</a>
+                <button class="btn btn-full btn-danger-bg" id="btn-remover">REMOVER</button>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="../js/detalhes.js"></script>
+</body>
+
+</html>

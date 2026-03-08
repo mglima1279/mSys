@@ -1,0 +1,359 @@
+:root {
+    --bg-color: #121212;
+    /* Fundo principal escuro (grafite profundo) */
+    --card-bg: #1E1E1E;
+    /* Fundo dos cartões um tom acima para dar profundidade */
+    --text-main: #F3F4F6;
+    /* Branco gelo para leitura confortável */
+    --text-light: #9CA3AF;
+    /* Cinza neutro para textos secundários e rótulos */
+    --primary: #3B82F6;
+    /* Azul elétrico moderno e tecnológico */
+    --primary-hover: #2563EB;
+    /* Azul um pouco mais denso para o clique */
+    --success: #10B981;
+    /* Verde esmeralda (brilha melhor no escuro) */
+    --danger: #EF4444;
+    /* Vermelho vivo para dark mode */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    /* Sombra preta mais forte */
+    --border-radius: 16px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+#app-container {
+    width: 100%;
+    max-width: 480px;
+    background-color: var(--bg-color);
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    padding-bottom: 30px;
+}
+
+header {
+    background-color: var(--primary);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+main {
+    padding: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.btn-voltar {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 20px 0 10px 0;
+}
+
+.card-total {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: var(--shadow);
+    margin-bottom: 15px;
+}
+
+.card-total h3 {
+    font-size: 1rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.card-total h2 {
+    font-size: 2.2rem;
+    margin-top: 5px;
+}
+
+.text-success {
+    color: var(--success);
+}
+
+.text-danger {
+    color: var(--danger);
+}
+
+.sub-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.card-sub {
+    background-color: var(--card-bg);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.card-sub h4 {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.card-sub p {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.btn {
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border: none;
+    padding: 15px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-full {
+    grid-column: span 2;
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-full:hover {
+    background-color: var(--primary-hover);
+}
+
+/* ================= LISTAS (EXTRATO E ESTOQUE) ================= */
+.lista-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+}
+
+.extrato-data {
+    font-weight: 600;
+    color: var(--text-light);
+    margin: 20px 0 10px 0;
+    border-bottom: 1px solid #374151;
+    /* Ajustado para dark mode */
+    padding-bottom: 5px;
+}
+
+.extrato-valor {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.extrato-tipo {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    background: var(--bg-color);
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.estoque-nome {
+    font-weight: 600;
+}
+
+.estoque-qtd {
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+/* ================= CONTROLES ESPECÍFICOS DO ESTOQUE ================= */
+.add-item-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.item-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-remover {
+    background-color: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: 0.2s;
+}
+
+.btn-remover:hover {
+    background-color: #e53935;
+}
+
+/* ================= DETALHES ================= */
+.detalhes-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #374151;
+    /* Ajustado para dark mode */
+    padding-bottom: 20px;
+}
+
+.detalhes-header h1 {
+    font-size: 2.5rem;
+    margin-top: 10px;
+}
+
+.detalhes-info p {
+    margin-bottom: 10px;
+    font-size: 1rem;
+    color: var(--text-light);
+}
+
+.detalhes-info span {
+    font-weight: 600;
+    color: var(--text-main);
+    display: block;
+    font-size: 1.1rem;
+}
+
+.detalhes-desc {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+/* ================= FORMULÁRIOS E INPUTS (DARK MODE) ================= */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #374151;
+    /* Borda cinza escura */
+    border-radius: 12px;
+    font-size: 1rem;
+    color: var(--text-main);
+    background: #111827;
+    /* Fundo do input bem escuro */
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    background: #1F2937;
+    /* Clareia levemente ao clicar */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    /* Brilho azul */
+}
+
+/* ================= INPUT DE ESTOQUE (DARK MODE) ================= */
+.estoque-input {
+    width: 70px;
+    padding: 8px;
+    text-align: center;
+    border: 2px solid #374151;
+    border-radius: 8px;
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 1.1rem;
+    outline: none;
+    background: #111827;
+}
+
+.estoque-input:focus {
+    border-color: var(--primary);
+    background: #1F2937;
+}
+
+/* ================= GRUPO DE BOTÕES (EDITAR/REMOVER) ================= */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.btn-group .btn {
+    flex: 1;
+    /* Faz os botões dividirem o espaço igualmente */
+}
+
+.btn-danger-bg {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-danger-bg:hover {
+    background-color: #e53935;
+    /* Um vermelho um pouco mais escuro ao passar o mouse */
+}

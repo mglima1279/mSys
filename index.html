@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Meus Doces</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="app-container">
+        <header>Home</header>
+        <main>
+            <h2 class="section-title">SALDO ATUAL</h2>
+            <div class="card-total">
+                <h3>TOTAL GERAL</h3>
+                <h2 class="text-primary">R$ <span id="total-saldo">0,00</span></h2>
+            </div>
+            <div class="sub-cards-grid">
+                <div class="card-sub">
+                    <h4>PESSOAL</h4>
+                    <p class="text-primary">R$ <span id="saldo-pessoal">0,00</span></p>
+                </div>
+                <div class="card-sub">
+                    <h4>EMPRESA</h4>
+                    <p class="text-primary">R$ <span id="saldo-empresa">0,00</span></p>
+                </div>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 30px;">ENTRADAS</h2>
+            <div class="card-total">
+                <h3>TOTAL</h3>
+                <h2 class="text-success">R$ <span id="total-entradas">0,00</span></h2>
+            </div>
+            <div class="sub-cards-grid">
+                <div class="card-sub">
+                    <h4>PESSOAL</h4>
+                    <p class="text-success">R$ <span id="entrada-pessoal">0,00</span></p>
+                </div>
+                <div class="card-sub">
+                    <h4>EMPRESA</h4>
+                    <p class="text-success">R$ <span id="entrada-empresa">0,00</span></p>
+                </div>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 30px;">DESPESAS</h2>
+            <div class="card-total">
+                <h3>TOTAL</h3>
+                <h2 class="text-danger">R$ <span id="total-despesas">0,00</span></h2>
+            </div>
+            <div class="sub-cards-grid">
+                <div class="card-sub">
+                    <h4>PESSOAL</h4>
+                    <p class="text-danger">R$ <span id="despesa-pessoal">0,00</span></p>
+                </div>
+                <div class="card-sub">
+                    <h4>EMPRESA</h4>
+                    <p class="text-danger">R$ <span id="despesa-empresa">0,00</span></p>
+                </div>
+            </div>
+
+            <div class="action-grid">
+                <a href="registrar-entrada-empresa/" class="btn">REGISTRAR<br>ENTRADA EMPRESA</a>
+                <a href="registrar-entrada-pessoal/" class="btn">REGISTRAR<br>ENTRADA PESSOAL</a>
+                <a href="registrar-saida-empresa/" class="btn">REGISTRAR<br>SAÍDA EMPRESA</a>
+                <a href="registrar-saida-pessoal/" class="btn">REGISTRAR<br>SAÍDA PESSOAL</a>
+
+                <a href="extrato/" class="btn btn-full">VER EXTRATO COMPLETO</a>
+                <a href="estoque/" class="btn btn-full">CONTROLE DE ESTOQUE</a>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="./js/app.js"></script>
+</body>
+
+</html>
