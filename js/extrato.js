@@ -1,4 +1,4 @@
-import { db, collection, getDocs } from "./config.js"
+import { db, collection, getDocs } from "https://mglima1279.github.io/mSys/js/config.js"
 
 const listaExtrato = document.getElementById("lista-extrato")
 

@@ -1,4 +1,4 @@
-import { db, collection, getDocs, doc, updateDoc, addDoc, deleteDoc } from "../config.js"
+import { db, collection, getDocs, doc, updateDoc, addDoc, deleteDoc } from "https://mglima1279.github.io/mSys/js/config.js"
 
 const listaEstoque = document.getElementById("lista-estoque")
 const btnSalvar = document.getElementById("btn-salvar")

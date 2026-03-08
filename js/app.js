@@ -1,4 +1,4 @@
-import { db, setDoc, doc, getDoc } from "./config.js"
+import { db, setDoc, doc, getDoc } from "https://mglima1279.github.io/mSys/js/config.js"
 
 const totalSaldo = document.getElementById("total-saldo")
 const saldoPessoal = document.getElementById("saldo-pessoal")

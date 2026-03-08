@@ -1,4 +1,4 @@
-import { db, collection, addDoc, doc, getDoc, updateDoc } from "../config.js"
+import { db, collection, addDoc, doc, getDoc, updateDoc } from "https://mglima1279.github.io/mSys/js/config.js"
 
 const form = document.querySelector("form")
 

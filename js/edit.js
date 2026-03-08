@@ -1,4 +1,4 @@
-import { db, doc, getDoc, updateDoc } from "../config.js"
+import { db, doc, getDoc, updateDoc } from "https://mglima1279.github.io/mSys/js/config.js"
 
 const id = localStorage.getItem("transacaoId")
 const mode = localStorage.getItem("transacaoMode")
