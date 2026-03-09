@@ -1,4 +1,4 @@
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, db, doc, setDoc, getDoc, arrayUnion } from "./config.js" //"https://mglima1279.github.io/mSys/js/config.js"
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, db, doc, setDoc, getDoc, arrayUnion } from "./config.js"
 
 const toggleMode = document.getElementById('toggle-mode')
 const authTitle = document.getElementById('auth-title')
