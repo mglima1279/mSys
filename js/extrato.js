@@ -1,29 +1,57 @@
-import { db, collection, getDocs } from "https://mglima1279.github.io/mSys/js/config.js"
+import { db, doc, getDoc } from "https://mglima1279.github.io/mSys/js/config.js"
 
 const listaExtrato = document.getElementById("lista-extrato")
 
 async function loadExtrato() {
     try {
-        const entradasSnapshot = await getDocs(collection(db, "entrada"))
-        const saidasSnapshot = await getDocs(collection(db, "saida"))
+        // 1. Pega o UID do usuário
+        const uid = JSON.parse(localStorage.getItem("uid"))
+        
+        if (!uid) {
+            alert("Usuário não autenticado. Faça login novamente.")
+            window.location.href = "../login/"
+            return
+        }
+
+        const userRef = doc(db, `users/${uid}`)
+        const userSnap = await getDoc(userRef)
 
         let transacoes = []
 
-        entradasSnapshot.forEach(doc => {
-            transacoes.push({ id: doc.id, mode: "entrada", ...doc.data() })
-        })
+        if (userSnap.exists()) {
+            const userData = userSnap.data()
+            
+            // Pega os arrays (se for usuário novo e não tiver, usa array vazio [])
+            const entradas = userData.entradas || []
+            const saídas = userData.saidas || []
 
-        saidasSnapshot.forEach(doc => {
-            transacoes.push({ id: doc.id, mode: "saida", ...doc.data() })
-        })
+            // 3. Junta as entradas na lista geral
+            entradas.forEach((item, index) => {
+                transacoes.push({ 
+                    ...item, 
+                    mode: "entradas", 
+                    id: index // Usamos a posição no array como um ID temporário
+                })
+            })
 
-        // Ordena para os mais recentes primeiro (considerando timestamp ou ID)
-        transacoes.sort((a, b) => Number(b.id) - Number(a.id))
+            // 4. Junta as saídas na lista geral
+            saídas.forEach((item, index) => {
+                transacoes.push({ 
+                    ...item, 
+                    mode: "saidas", 
+                    id: index
+                })
+            })
+        }
+
+        // 5. Ordena as transações pela Data (da mais recente para a mais antiga)
+        transacoes.sort((a, b) => new Date(b.date) - new Date(a.date))
 
         listaExtrato.innerHTML = ""
         let dataAtual = ""
 
         transacoes.forEach(item => {
+            // Lógica de agrupamento por Data (separadores visuais)
             if (item.date !== dataAtual) {
                 const dataDiv = document.createElement("div")
                 dataDiv.className = "extrato-data"
@@ -37,18 +65,20 @@ async function loadExtrato() {
             linkItem.href = "../detalhes/"
             linkItem.className = "lista-item"
 
-            // Salva no Local Storage qual item foi clicado
+            // Salva no Local Storage qual item foi clicado (usando o index e o mode)
             linkItem.addEventListener("click", () => {
                 localStorage.setItem("transacaoId", item.id)
-                localStorage.setItem("transacaoMode", item.mode) // "entrada" ou "saida"
+                localStorage.setItem("transacaoMode", item.mode) 
             })
 
-            const isEntrada = item.mode === "entrada"
+            // Ajuste na verificação para o plural ("entradas")
+            const isEntrada = item.mode === "entradas"
             const corValor = isEntrada ? "text-success" : "text-danger"
             const sinal = isEntrada ? "+ R$" : "- R$"
+            
+            // Garante que o valor seja tratado como número antes de formatar
             const valorFormatado = Number(item.value).toFixed(2).replace(".", ",")
-
-            const tipoExibicao = item.type.toUpperCase() // 'PESSOAL' ou 'EMPRESA'
+            const tipoExibicao = item.type.toUpperCase() 
 
             linkItem.innerHTML = `
                 <span class="extrato-valor ${corValor}">${sinal} ${valorFormatado}</span>

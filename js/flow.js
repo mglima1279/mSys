@@ -1,95 +1,112 @@
-import { db, collection, addDoc, doc, getDoc, updateDoc } from "https://mglima1279.github.io/mSys/js/config.js"
+import { db, doc, getDoc, updateDoc, arrayUnion } from "./config.js"
 
 const form = document.querySelector("form")
 
-if (form) {
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault()
+// 1. PROTEÇÃO DE PLURAL: Garante que "entrada" vira "entradas" para bater com o banco de dados
+let mode = document.body.id
+if (mode === "entrada") mode = "entradas"
+if (mode === "saida") mode = "saidas"
 
-        const btnSalvar = form.querySelector('button[type="submit"]')
-        const textoOriginal = btnSalvar.innerText
-        btnSalvar.disabled = true
-        btnSalvar.innerText = "SALVANDO..."
+const tipoTransacao = form.id // Espera-se "empresa" ou "pessoal"
 
-        const mode = document.body.id
-        const tipoTransacao = form.id
+form.addEventListener("submit", async (e) => {
+    e.preventDefault()
 
-        const priceInput = document.getElementById("price")
-        const paySelect = document.getElementById("pay")
-        const descInput = document.getElementById("desc")
-        const checkRepasse = document.getElementById("check-repasse")
+    const btnSalvar = form.querySelector('button[type="submit"]')
+    const textoOriginal = btnSalvar.textContent
+    btnSalvar.disabled = true
+    btnSalvar.textContent = "SALVANDO..."
 
-        let valor = Number(priceInput.value)
-        const metodo = paySelect.value
-        const descricao = descInput.value
+    const uid = JSON.parse(localStorage.getItem("uid"))
+    
+    if (!uid) {
+        alert("Usuário não autenticado. Faça login novamente.")
+        window.location.href = "../login/"
+        return
+    }
 
-        const dataAtual = new Date()
-        const dataStr = dataAtual.toISOString().split("T")[0]
+    const data = new FormData(form)
+    const checkRepasse = document.getElementById("check-repasse")
 
-        if (valor <= 0) {
-            alert("O valor deve ser maior que zero.")
-            btnSalvar.disabled = false
-            btnSalvar.innerText = textoOriginal
-            return
+    let valor = parseFloat(data.get("price"))
+    const metodo = data.get("pay")
+    const descricao = data.get("desc")
+
+    const dataAtual = new Date()
+    const dataStr = dataAtual.toISOString().split("T")[0]
+
+    if (valor <= 0 || isNaN(valor)) {
+        alert("O valor deve ser um número maior que zero.")
+        btnSalvar.disabled = false
+        btnSalvar.textContent = textoOriginal
+        return
+    }
+
+    let valorPrincipal = valor
+    let valorRepasse = 0
+
+    if (checkRepasse && checkRepasse.checked) {
+        valorRepasse = valor * 0.5
+        valorPrincipal = valor - valorRepasse
+    }
+
+    try {
+        const userRef = doc(db, `users/${uid}`)
+        const userSnap = await getDoc(userRef)
+
+        // 2. PARADA OBRIGATÓRIA: Se não tem doc, não tente continuar
+        if (!userSnap.exists()) {
+            throw new Error("Documento do usuário não encontrado no banco de dados.")
         }
 
-        let valorPrincipal = valor
-        let valorRepasse = 0
-
-        if (checkRepasse && checkRepasse.checked && mode === "entrada" && tipoTransacao === "empresa") {
-            valorRepasse = valor * 0.5
-            valorPrincipal = valor - valorRepasse
+        const userData = userSnap.data()
+        
+        const transacaoPrincipal = {
+            value: valorPrincipal,
+            type: tipoTransacao,
+            date: dataStr,
+            desc: descricao,
+            method: metodo
         }
 
-        try {
-            await addDoc(collection(db, mode), {
-                value: valorPrincipal,
-                type: tipoTransacao,
+        let novasTransacoes = [transacaoPrincipal]
+
+        if (valorRepasse > 0) {
+            const transacaoRepasse = {
+                value: valorRepasse,
+                type: "pessoal",
                 date: dataStr,
-                desc: descricao,
+                desc: descricao ? `${descricao} (Repasse 50%)` : "Repasse automático (50%)",
                 method: metodo
-            })
-
-            if (valorRepasse > 0) {
-                await addDoc(collection(db, mode), {
-                    value: valorRepasse,
-                    type: "pessoal",
-                    date: dataStr,
-                    desc: descricao ? `${descricao} (Repasse 50%)` : "Repasse automático (50%)",
-                    method: metodo
-                })
             }
-
-            const totalRef = doc(db, "valores-totais", mode)
-            const totalSnap = await getDoc(totalRef)
-
-            if (totalSnap.exists()) {
-                const totaisAtuais = totalSnap.data()
-
-                let novoValorPrincipal = (totaisAtuais[tipoTransacao] || 0) + valorPrincipal
-                let atualizacoes = { [tipoTransacao]: novoValorPrincipal }
-
-                if (valorRepasse > 0) {
-                    let novoValorPessoal = (totaisAtuais["pessoal"] || 0) + valorRepasse
-                    atualizacoes["pessoal"] = novoValorPessoal
-                }
-
-                await updateDoc(totalRef, atualizacoes)
-            } else {
-                let criacao = { [tipoTransacao]: valorPrincipal }
-                if (valorRepasse > 0) {
-                    criacao["pessoal"] = valorRepasse
-                }
-                await updateDoc(totalRef, criacao)
-            }
-
-            alert("Transação registrada com sucesso!")
-            window.location.href = "../extrato/"
-        } catch (error) {
-            console.error(error)
-            alert("Erro ao salvar transação.")
-            btnSalvar.disabled = false
-            btnSalvar.innerText = textoOriginal
+            novasTransacoes.push(transacaoRepasse)
         }
-    })
-}
+
+        // 3. ESCUDO PROTETOR DOS VALORES (Usando || 0)
+        let totalPrincipal = userData.valoresTotais?.[mode]?.[tipoTransacao] || 0
+        totalPrincipal += valorPrincipal
+
+        let updates = {
+            [mode]: arrayUnion(...novasTransacoes), 
+            [`valoresTotais.${mode}.${tipoTransacao}`]: totalPrincipal
+        }
+
+        if (valorRepasse > 0) {
+            let totalPessoal = userData.valoresTotais?.[mode]?.pessoal || 0
+            totalPessoal += valorRepasse
+            
+            updates[`valoresTotais.${mode}.pessoal`] = totalPessoal
+        }
+
+        await updateDoc(userRef, updates)
+
+        alert("Transação registrada com sucesso!")
+        window.location.href = "../extrato/"
+        
+    } catch (error) {
+        console.error(error)
+        alert("Erro ao salvar transação. Verifique sua conexão.")
+        btnSalvar.disabled = false
+        btnSalvar.textContent = textoOriginal
+    }
+})

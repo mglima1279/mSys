@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js"
-import { getFirestore, setDoc, doc, getDoc, collection, updateDoc, getDocs, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js"
+import { getFirestore, setDoc, doc, getDoc, collection, updateDoc, getDocs, deleteDoc, addDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js"
 
 const firebaseConfig = {
@@ -9,10 +9,12 @@ const firebaseConfig = {
     storageBucket: "msys-cca52.firebasestorage.app",
     messagingSenderId: "685647449755",
     appId: "1:685647449755:web:a6869fc1f14b980e7b403e"
-}
+};
+
 
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
+const auth = getAuth(app)
 
 export {
     app,
@@ -27,5 +29,7 @@ export {
     updateDoc,
     getDocs,
     deleteDoc,
-    addDoc
+    addDoc,
+    auth, 
+    arrayUnion
 }

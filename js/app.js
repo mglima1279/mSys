@@ -1,4 +1,4 @@
-import { db, setDoc, doc, getDoc } from "https://mglima1279.github.io/mSys/js/config.js"
+import { db, doc, getDoc } from "https://mglima1279.github.io/mSys/js/config.js"
 
 const totalSaldo = document.getElementById("total-saldo")
 const saldoPessoal = document.getElementById("saldo-pessoal")
@@ -12,43 +12,54 @@ const totalDespesas = document.getElementById("total-despesas")
 const despesaPessoal = document.getElementById("despesa-pessoal")
 const despesaEmpresa = document.getElementById("despesa-empresa")
 
-async function fetchTotalData(tipo) {
-    const docRef = doc(db, `valores-totais/${tipo}`)
+async function main() {
+    const uid = JSON.parse(localStorage.getItem("uid"))
+
+    if (!uid) {
+        window.location.href = "login/"
+        return
+    }
+
+    const docRef = doc(db, `users/${uid}`)
     const docRead = await getDoc(docRef)
+
+    let entrada = { empresa: 0, pessoal: 0 }
+    let saida = { empresa: 0, pessoal: 0 }
 
     if (docRead.exists()) {
         const data = docRead.data()
-        return {
-            empresa: data.empresa || 0,
-            pessoal: data.pessoal || 0
+        
+        if (data.valoresTotais) {
+            if (data.valoresTotais.entradas) {
+                entrada.empresa = data.valoresTotais.entradas.empresa || 0
+                entrada.pessoal = data.valoresTotais.entradas.pessoal || 0
+            }
+            if (data.valoresTotais.saidas) {
+                saida.empresa = data.valoresTotais.saidas.empresa || 0
+                saida.pessoal = data.valoresTotais.saidas.pessoal || 0
+            }
         }
+    } else {
+        console.warn("Documento do usuário não encontrado. Os saldos serão zerados.")
     }
-
-    const defaultInfo = { empresa: 0, pessoal: 0 }
-    await setDoc(docRef, defaultInfo)
-
-    return defaultInfo
-}
-
-async function main() {
-    const entrada = await fetchTotalData("entrada")
-    const saida = await fetchTotalData("saida")
 
     const calcSaldoPessoal = entrada.pessoal - saida.pessoal
     const calcSaldoEmpresa = entrada.empresa - saida.empresa
     const calcSaldoTotal = calcSaldoPessoal + calcSaldoEmpresa
 
-    totalSaldo.textContent = calcSaldoTotal.toFixed(2)
-    saldoPessoal.textContent = calcSaldoPessoal.toFixed(2)
-    saldoEmpresa.textContent = calcSaldoEmpresa.toFixed(2)
+    const formatar = (valor) => valor.toFixed(2).replace('.', ',')
 
-    totalEntradas.textContent = (entrada.empresa + entrada.pessoal).toFixed(2)
-    entradaPessoal.textContent = entrada.pessoal.toFixed(2)
-    entradaEmpresa.textContent = entrada.empresa.toFixed(2)
+    totalSaldo.textContent = formatar(calcSaldoTotal)
+    saldoPessoal.textContent = formatar(calcSaldoPessoal)
+    saldoEmpresa.textContent = formatar(calcSaldoEmpresa)
 
-    totalDespesas.textContent = (saida.empresa + saida.pessoal).toFixed(2)
-    despesaPessoal.textContent = saida.pessoal.toFixed(2)
-    despesaEmpresa.textContent = saida.empresa.toFixed(2)
+    totalEntradas.textContent = formatar(entrada.empresa + entrada.pessoal)
+    entradaPessoal.textContent = formatar(entrada.pessoal)
+    entradaEmpresa.textContent = formatar(entrada.empresa)
+
+    totalDespesas.textContent = formatar(saida.empresa + saida.pessoal)
+    despesaPessoal.textContent = formatar(saida.pessoal)
+    despesaEmpresa.textContent = formatar(saida.empresa)
 }
 
 main()

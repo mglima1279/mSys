@@ -1,4 +1,4 @@
-import { db, collection, getDocs, doc, updateDoc, addDoc, deleteDoc } from "https://mglima1279.github.io/mSys/js/config.js"
+import { db, doc, getDoc, updateDoc, arrayUnion } from "./config.js"
 
 const listaEstoque = document.getElementById("lista-estoque")
 const btnSalvar = document.getElementById("btn-salvar")
@@ -6,23 +6,43 @@ const btnAdicionar = document.getElementById("btn-adicionar")
 const inputNovoNome = document.getElementById("novo-nome")
 const inputNovoQtd = document.getElementById("novo-qtd")
 
+// Função auxiliar para pegar o ID do usuário (usada em várias partes)
+function getUserId() {
+    const uid = JSON.parse(localStorage.getItem("uid"))
+    if (!uid) {
+        alert("Usuário não autenticado. Faça login novamente.")
+        window.location.href = "../login/"
+        return null
+    }
+    return uid
+}
+
 async function loadEstoque() {
+    const uid = getUserId()
+    if (!uid) return
+
     try {
-        const estoqueSnapshot = await getDocs(collection(db, "estoque"))
+        const userRef = doc(db, `users/${uid}`)
+        const userSnap = await getDoc(userRef)
+
         listaEstoque.innerHTML = ""
 
-        if (estoqueSnapshot.empty) {
-            listaEstoque.innerHTML = "<p style='text-align: center;' id='msg-vazio'>Estoque vazio.</p>"
-            return
-        }
+        if (userSnap.exists()) {
+            const userData = userSnap.data()
+            const estoque = userData.estoque || [] // Pega o array de estoque ou cria um vazio
 
-        estoqueSnapshot.forEach(docSnap => {
-            const item = docSnap.data()
-            renderItemDOM(docSnap.id, item.nome, item.qtd)
-        })
+            if (estoque.length === 0) {
+                listaEstoque.innerHTML = "<p style='text-align: center;' id='msg-vazio'>Estoque vazio.</p>"
+                return
+            }
+
+            estoque.forEach(item => {
+                renderItemDOM(item.id, item.nome, item.qtd)
+            })
+        }
     } catch (error) {
         console.error(error)
-        listaEstoque.innerHTML = "<p style='text-align: center; color: red;'>Erro ao carregar estoque.</p>"
+        listaEstoque.innerHTML = "<p style='text-align: center; color: var(--danger);'>Erro ao carregar estoque.</p>"
     }
 }
 
@@ -50,14 +70,25 @@ function renderItemDOM(id, nome, qtd) {
 
         if (confirmar) {
             e.target.disabled = true
+            const uid = getUserId()
+            if(!uid) return
+
             try {
-                await deleteDoc(doc(db, "estoque", itemId))
+                const userRef = doc(db, `users/${uid}`)
+                const userSnap = await getDoc(userRef)
+                
+                // Pega a lista atual, remove o item clicado e salva a nova lista
+                const estoqueAtual = userSnap.data().estoque || []
+                const novoEstoque = estoqueAtual.filter(item => item.id !== itemId)
+
+                await updateDoc(userRef, { estoque: novoEstoque })
                 divItem.remove()
 
                 if (listaEstoque.children.length === 0) {
                     listaEstoque.innerHTML = "<p style='text-align: center;' id='msg-vazio'>Estoque vazio.</p>"
                 }
             } catch (error) {
+                console.error(error)
                 alert("Erro ao remover item.")
                 e.target.disabled = false
             }
@@ -66,6 +97,9 @@ function renderItemDOM(id, nome, qtd) {
 }
 
 btnAdicionar.addEventListener("click", async () => {
+    const uid = getUserId()
+    if (!uid) return
+
     const nome = inputNovoNome.value.trim().toUpperCase()
     const qtd = Number(inputNovoQtd.value)
 
@@ -83,12 +117,19 @@ btnAdicionar.addEventListener("click", async () => {
     btnAdicionar.innerText = "..."
 
     try {
-        const docRef = await addDoc(collection(db, "estoque"), {
-            nome: nome,
-            qtd: qtd
+        const userRef = doc(db, `users/${uid}`)
+        
+        // Como não usamos mais uma coleção separada, precisamos criar um ID único na mão
+        const novoId = "item_" + Date.now() 
+        
+        const novoItem = { id: novoId, nome: nome, qtd: qtd }
+
+        // arrayUnion adiciona o novo item ao final da lista existente no banco
+        await updateDoc(userRef, {
+            estoque: arrayUnion(novoItem)
         })
 
-        renderItemDOM(docRef.id, nome, qtd)
+        renderItemDOM(novoId, nome, qtd)
 
         inputNovoNome.value = ""
         inputNovoQtd.value = "1"
@@ -102,11 +143,23 @@ btnAdicionar.addEventListener("click", async () => {
 })
 
 btnSalvar.addEventListener("click", async () => {
+    const uid = getUserId()
+    if (!uid) return
+
     const inputs = document.querySelectorAll(".estoque-input")
     let temZero = false
+    let novoEstoqueAtualizado = []
 
+    // Varre todos os inputs da tela para montar a nova lista atualizada
     inputs.forEach(input => {
-        if (Number(input.value) <= 0) temZero = true
+        const qtd = Number(input.value)
+        if (qtd <= 0) temZero = true
+
+        const id = input.getAttribute("data-id")
+        // Pega o nome do produto subindo para a div pai e buscando o span
+        const nome = input.closest(".lista-item").querySelector(".estoque-nome").innerText 
+
+        novoEstoqueAtualizado.push({ id, nome, qtd })
     })
 
     if (temZero) {
@@ -119,16 +172,11 @@ btnSalvar.addEventListener("click", async () => {
     btnSalvar.innerText = "SALVANDO..."
 
     try {
-        const promessas = []
-
-        inputs.forEach(input => {
-            const id = input.getAttribute("data-id")
-            const novaQtd = Number(input.value)
-            const docRef = doc(db, "estoque", id)
-            promessas.push(updateDoc(docRef, { qtd: novaQtd }))
-        })
-
-        await Promise.all(promessas)
+        const userRef = doc(db, `users/${uid}`)
+        
+        // Substitui a lista de estoque inteira pela nossa lista atualizada
+        await updateDoc(userRef, { estoque: novoEstoqueAtualizado })
+        
         alert("Estoque atualizado com sucesso!")
     } catch (error) {
         console.error(error)
