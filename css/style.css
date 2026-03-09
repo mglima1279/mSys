@@ -357,3 +357,58 @@ a {
     background-color: #e53935;
     /* Um vermelho um pouco mais escuro ao passar o mouse */
 }
+
+/* ================= TELA DE LOGIN / AUTENTICAÇÃO ================= */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.auth-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    padding: 30px 20px;
+}
+
+.auth-logo {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.auth-icon {
+    font-size: 4rem;
+}
+
+.auth-logo h2 {
+    font-size: 1.8rem;
+    color: var(--primary);
+    margin-top: 10px;
+}
+
+.auth-subtitle {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.auth-toggle {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.95rem;
+    color: var(--text-light);
+}
+
+.auth-toggle a {
+    color: var(--primary);
+    font-weight: 600;
+    margin-left: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.auth-toggle a:hover {
+    text-decoration: underline;
+    color: var(--text-main);
+}
