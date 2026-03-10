@@ -23,28 +23,50 @@ async function main() {
     const docRef = doc(db, `users/${uid}`)
     const docRead = await getDoc(docRef)
 
-    let entrada = { empresa: 0, pessoal: 0 }
-    let saida = { empresa: 0, pessoal: 0 }
+    let entradaTotal = { empresa: 0, pessoal: 0 }
+    let saidaTotal = { empresa: 0, pessoal: 0 }
+    
+    let entradaMes = { empresa: 0, pessoal: 0 }
+    let saidaMes = { empresa: 0, pessoal: 0 }
+
+    const hoje = new Date()
+    const mesAtual = String(hoje.getMonth() + 1).padStart(2, '0')
+    const anoAtual = String(hoje.getFullYear())
+    const prefixoMesAtual = `${anoAtual}-${mesAtual}`
 
     if (docRead.exists()) {
         const data = docRead.data()
-        
+
         if (data.valoresTotais) {
             if (data.valoresTotais.entradas) {
-                entrada.empresa = data.valoresTotais.entradas.empresa || 0
-                entrada.pessoal = data.valoresTotais.entradas.pessoal || 0
+                entradaTotal.empresa = data.valoresTotais.entradas.empresa || 0
+                entradaTotal.pessoal = data.valoresTotais.entradas.pessoal || 0
             }
             if (data.valoresTotais.saidas) {
-                saida.empresa = data.valoresTotais.saidas.empresa || 0
-                saida.pessoal = data.valoresTotais.saidas.pessoal || 0
+                saidaTotal.empresa = data.valoresTotais.saidas.empresa || 0
+                saidaTotal.pessoal = data.valoresTotais.saidas.pessoal || 0
             }
         }
-    } else {
-        console.warn("Documento do usuário não encontrado. Os saldos serão zerados.")
+
+        const listaEntradas = data.entradas || []
+        listaEntradas.forEach(item => {
+            if (item.date && item.date.startsWith(prefixoMesAtual)) {
+                if (item.type === "empresa") entradaMes.empresa += Number(item.value)
+                if (item.type === "pessoal") entradaMes.pessoal += Number(item.value)
+            }
+        })
+
+        const listaSaidas = data.saidas || []
+        listaSaidas.forEach(item => {
+            if (item.date && item.date.startsWith(prefixoMesAtual)) {
+                if (item.type === "empresa") saidaMes.empresa += Number(item.value)
+                if (item.type === "pessoal") saidaMes.pessoal += Number(item.value)
+            }
+        })
     }
 
-    const calcSaldoPessoal = entrada.pessoal - saida.pessoal
-    const calcSaldoEmpresa = entrada.empresa - saida.empresa
+    const calcSaldoPessoal = entradaTotal.pessoal - saidaTotal.pessoal
+    const calcSaldoEmpresa = entradaTotal.empresa - saidaTotal.empresa
     const calcSaldoTotal = calcSaldoPessoal + calcSaldoEmpresa
 
     const formatar = (valor) => valor.toFixed(2).replace('.', ',')
@@ -53,13 +75,13 @@ async function main() {
     saldoPessoal.textContent = formatar(calcSaldoPessoal)
     saldoEmpresa.textContent = formatar(calcSaldoEmpresa)
 
-    totalEntradas.textContent = formatar(entrada.empresa + entrada.pessoal)
-    entradaPessoal.textContent = formatar(entrada.pessoal)
-    entradaEmpresa.textContent = formatar(entrada.empresa)
+    totalEntradas.textContent = formatar(entradaMes.empresa + entradaMes.pessoal)
+    entradaPessoal.textContent = formatar(entradaMes.pessoal)
+    entradaEmpresa.textContent = formatar(entradaMes.empresa)
 
-    totalDespesas.textContent = formatar(saida.empresa + saida.pessoal)
-    despesaPessoal.textContent = formatar(saida.pessoal)
-    despesaEmpresa.textContent = formatar(saida.empresa)
+    totalDespesas.textContent = formatar(saidaMes.empresa + saidaMes.pessoal)
+    despesaPessoal.textContent = formatar(saidaMes.pessoal)
+    despesaEmpresa.textContent = formatar(saidaMes.empresa)
 }
 
 main()
